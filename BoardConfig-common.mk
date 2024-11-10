@@ -9,13 +9,11 @@ DEVICE_UNIFIED_PATH := device/google/shusky
 DEVICE_PATH := $(DEVICE_UNIFIED_PATH)/$(DEVICE_CODENAME)
 DEVICE_COMMON_PATH := device/google/zuma
 
-include $(DEVICE_COMMON_PATH)/BoardConfig-common.mk
-include vendor/google/$(DEVICE_CODENAME)/BoardConfigVendor.mk
+# include $(DEVICE_COMMON_PATH)/BoardConfig-common.mk
+# include vendor/google/$(DEVICE_CODENAME)/BoardConfigVendor.mk
 
 TARGET_BOARD_INFO_FILE := $(DEVICE_PATH)/board-info.txt
 
-# For building with minimal manifest
-ALLOW_MISSING_DEPENDENCIES := true
 
 # 12.1 manifest requirements
 TARGET_SUPPORTS_64_BIT_APPS := true
@@ -25,7 +23,6 @@ BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
 BUILD_BROKEN_MISSING_REQUIRED_MODULES := true
 
 # A/B
-AB_OTA_UPDATER := true
 
 # Architecture
 TARGET_SOC := zuma
@@ -36,32 +33,19 @@ USES_DEVICE_GOOGLE_ZUMA := true
 USES_DEVICE_GOOGLE_$(DEVICE_CODENAME) := true
 USES_DEVICE_GOOGLE_SHUSKY := true
 
-TARGET_ARCH := arm64
-TARGET_ARCH_VARIANT := armv8-2a
-TARGET_CPU_ABI := arm64-v8a
-TARGET_CPU_VARIANT := cortex-a55
-TARGET_CPU_VARIANT_RUNTIME := cortex-a55
 
-# Enable 64-bit for non-zygote.
+
 ZYGOTE_FORCE_64 := true
 
 # Force any prefer32 targets to be compiled as 64 bit.
 IGNORE_PREFER32_ON_DEVICE := true
 
-ENABLE_CPUSETS := true
-ENABLE_SCHEDBOOST := true
-
 # APEX
 DEXPREOPT_GENERATE_APEX_IMAGE := true
 
-# Bootloader
-TARGET_BOOTLOADER_BOARD_NAME := $(DEVICE_CODENAME)
-TARGET_NO_BOOTLOADER := true
-
-# Display
 TARGET_SCREEN_DENSITY := 480
 TARGET_USES_VULKAN := true
-BOARD_EGL_CFG := $(DEVICE_COMMON_PATH)/conf/egl.cfg
+# BOARD_EGL_CFG := $(DEVICE_COMMON_PATH)/conf/egl.cfg
 
 # EMULATOR common modules
 BOARD_EMULATOR_COMMON_MODULES := liblight
@@ -101,76 +85,23 @@ TARGET_KERNEL_EXT_MODULES := \
     video/gchips \
     ../google-devices/shusky/display
 
-# Partitions
+
 BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)
 BOARD_BOOTIMAGE_PARTITION_SIZE := 67108864
 BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 67108864
-BOARD_HAS_LARGE_FILESYSTEM := true
 BOARD_SYSTEMIMAGE_PARTITION_TYPE := ext4
-BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := ext4
-BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
-TARGET_COPY_OUT_VENDOR := vendor
-BOARD_SUPER_PARTITION_SIZE := 9126805504 # TODO: Fix hardcoded value
-BOARD_SUPER_PARTITION_GROUPS := google_dynamic_partitions
-BOARD_GOOGLE_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vendor vendor_dlkm
-BOARD_GOOGLE_DYNAMIC_PARTITIONS_SIZE := 9122611200 # TODO: Fix hardcoded value
-
-VENDOR_CMDLINE := "dyndbg=\"func alloc_contig_dump_pages +p\" \
-                earlycon=exynos4210,0x10A00000 console=ttySAC0,115200 androidboot.console=ttySAC0 printk.devkmsg=on \
-                swiotlb=noforce \
-		cma_sysfs.experimental=Y \
-		cgroup_disable=memory \
-		rcupdate.rcu_expedited=1 \
-		rcu_nocbs=all \
-		stack_depot_disable=off \
-		page_pinner=on \
-		swiotlb=1024 \
-		disable_dma32=on \
-                at24.write_timeout=100 \
-		log_buf_len=1024K \
-		bootconfig"
-
 BOARD_BOOTCONFIG += androidboot.load_modules_parallel=true
 BOARD_KERNEL_CMDLINE += exynos_drm.load_sequential=1
-
-# Kernel
-BOARD_KERNEL_BASE        := 0x1000000
-BOARD_KERNEL_PAGESIZE    := 2048
-BOARD_KERNEL_OFFSET      := 0x00008000
-BOARD_RAMDISK_OFFSET     := 0x01000000
-BOARD_KERNEL_TAGS_OFFSET := 0x00000100
-BOARD_DTB_OFFSET         := 0x01f00000
-
-# vendor_boot as recovery
-BOARD_BOOT_HEADER_VERSION := 4
 BOARD_USES_RECOVERY_AS_BOOT := false
 BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
 BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
-BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := false
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
 BOARD_MOVE_GSI_AVB_KEYS_TO_VENDOR_BOOT := true
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
-BOARD_KERNEL_IMAGE_NAME := Image.lz4
 TARGET_KERNEL_CONFIG := gki_defconfig
 TARGET_KERNEL_SOURCE := kernel/google/zuma
-TARGET_PREBUILT_KERNEL := $(DEVICE_UNIFIED_PATH)/prebuilt/Image.lz4
 BOARD_PREBUILT_DTBIMAGE_DIR := $(DEVICE_UNIFIED_PATH)/prebuilt/dtbs
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_UNIFIED_PATH)/prebuilt/dtbs/dtbo.img
-BOARD_MKBOOTIMG_ARGS += --base $(BOARD_KERNEL_BASE)
-BOARD_MKBOOTIMG_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
-BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
-BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
-BOARD_MKBOOTIMG_ARGS += --kernel_offset $(BOARD_KERNEL_OFFSET)
-BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION) 
-BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
-BOARD_MKBOOTIMG_ARGS += --vendor_cmdline $(VENDOR_CMDLINE)
-
-# Platform
-TARGET_BOARD_PLATFORM := zuma
-
-# Colour fix stuff
-TARGET_RECOVERY_PIXEL_FORMAT := ABGR_8888
 TARGET_RECOVERY_UI_MARGIN_HEIGHT := 165
 TARGET_RECOVERY_UI_LIB := \
 	librecovery_ui_pixel \
@@ -181,28 +112,16 @@ BOARD_HDMI_INCAPABLE := true
 TARGET_USES_HWC2 := true
 HWC_SUPPORT_RENDER_INTENT := true
 HWC_SUPPORT_COLOR_TRANSFORM := true
-#BOARD_USES_DISPLAYPORT := true
-# if AFBC is enabled, must set ro.vendor.ddk.set.afbc=1
+
 BOARD_USES_EXYNOS_AFBC_FEATURE := true
-#BOARD_USES_HDRUI_GLES_CONVERSION := true
+
 
 BOARD_LIBACRYL_DEFAULT_COMPOSITOR := fimg2d_zuma
 BOARD_LIBACRYL_G2D_HDR_PLUGIN := libacryl_hdr_plugin
 
 # HWCServices
 BOARD_USES_HWC_SERVICES := true
-
-# Recovery
-TARGET_USERIMAGES_USE_EXT4 := true
-TARGET_USERIMAGES_USE_F2FS := true
-TARGET_RECOVERY_FSTAB := $(DEVICE_UNIFIED_PATH)/recovery.fstab
-TARGET_RECOVERY_WIPE := $(DEVICE_UNIFIED_PATH)/recovery.wipe
-
-# Ramdisk compression
-BOARD_RAMDISK_USE_LZ4 := true
-
 # Verified Boot
-BOARD_AVB_ENABLE := true
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
 
 # Enable chained vbmeta for boot images
@@ -217,44 +136,180 @@ BOARD_AVB_INIT_BOOT_ALGORITHM := SHA256_RSA2048
 BOARD_AVB_INIT_BOOT_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
 BOARD_AVB_INIT_BOOT_ROLLBACK_INDEX_LOCATION := 4
 
-# Hack: prevent anti rollback
-PLATFORM_VERSION := 99.87.36
-PLATFORM_SECURITY_PATCH := 2127-12-31
-PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
-VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
-BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
-
 # sepolicy
 SELINUX_IGNORE_NEVERALLOWS := true
-
-# Load Touch modules files
-TW_LOAD_VENDOR_MODULES := "heatmap.ko touch_offload.ko ftm5.ko sec_touch.ko goodix_brl_touch.ko goog_touch_interface.ko"
-
-# TWRP specific build flags
 TWRP_EVENT_LOGGING := true
-TWRP_INCLUDE_LOGCAT := true
-TARGET_USES_LOGD := true
-TW_THEME := portrait_hdpi
-TW_USE_SERIALNO_PROPERTY_FOR_DEVICE_ID := true
-TW_EXTRA_LANGUAGES := true
-TW_NO_SCREEN_BLANK := true
 TW_NO_SCREEN_TIMEOUT := true
-TW_INPUT_BLACKLIST := "hbtp_vm"
-TW_MAX_BRIGHTNESS := 1600
-TW_INCLUDE_FASTBOOTD := true
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.0/lun.%d/file
-TW_USE_TOOLBOX := true
-TW_INCLUDE_REPACKTOOLS := true
-TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
-TW_EXCLUDE_DEFAULT_USB_INIT := true
-TW_INCLUDE_RESETPROP := true
-TW_INCLUDE_RESETPROP_SOURCE := true
-TW_INCLUDE_LIBRESETPROP := true
-TW_INCLUDE_LIBRESETPROP_SOURCE := true
-TW_EXCLUDE_APEX := true
+
+
 #TW_SUPPORT_INPUT_AIDL_HAPTICS := true
+
+
+# add new params
 TW_USE_CRYPTO := false
 TW_Y_OFFSET := 5
 TW_H_OFFSET := -5
+TW_EXCLUDE_APEX := true
+ALLOW_MISSING_DEPENDENCIES := true
+TARGET_ARCH := arm64
+TARGET_ARCH_VARIANT := armv8-2a
+# TARGET_ARCH := arm64
+# TARGET_ARCH_VARIANT := armv8-a
+# TARGET_CPU_ABI := arm64-v8a
+TARGET_CPU_VARIANT := cortex-a55
+# TARGET_CPU_VARIANT_RUNTIME := cortex-a55
+TARGET_CPU_ABI := arm64-v8a
+TARGET_CPU_ABI2 :=
+TARGET_2ND_ARCH := arm
+TARGET_2ND_ARCH_VARIANT := $(TARGET_ARCH_VARIANT)
+TARGET_2ND_CPU_ABI := armeabi-v7a
+TARGET_2ND_CPU_ABI2 := armeabi
+TARGET_2ND_CPU_VARIANT := $(TARGET_CPU_VARIANT)
+ENABLE_CPUSETS := true
+ENABLE_SCHEDBOOST := true
+TARGET_SCREEN_WIDTH := 1344
+TARGET_SCREEN_HEIGHT := 2992
+PRODUCT_PLATFORM := zuma
+TARGET_BOOTLOADER_BOARD_NAME := $(DEVICE_CODENAME)
+TARGET_NO_BOOTLOADER := true
+TARGET_USES_UEFI := true
+TARGET_BOARD_PLATFORM := zuma
+# TARGET_BOARD_PLATFORM := xiaomi_sm8550
+# TARGET_BOARD_PLATFORM_GPU := qcom-adreno740
+BOARD_KERNEL_PAGESIZE    := 2048
+BOARD_BOOT_HEADER_VERSION := 4
+BOARD_KERNEL_BASE        := 0x1000000
+BOARD_KERNEL_OFFSET      := 0x00008000
+BOARD_RAMDISK_OFFSET     := 0x01000000
+BOARD_KERNEL_TAGS_OFFSET := 0x00000100
+BOARD_DTB_OFFSET         := 0x01f00000
+TARGET_KERNEL_ARCH            := arm64
+TARGET_KERNEL_HEADER_ARCH     := arm64
+BOARD_KERNEL_IMAGE_NAME := Image.lz4
+TARGET_KERNEL_CLANG_COMPILE   := true
+TARGET_PREBUILT_KERNEL := $(DEVICE_UNIFIED_PATH)/prebuilt/Image.lz4
+VENDOR_CMDLINE := \
+        "dyndbg=\"func alloc_contig_dump_pages +p\" \
+        earlycon=exynos4210,0x10A00000 console=ttySAC0,115200 \
+        androidboot.console=ttySAC0 printk.devkmsg=on \
+        swiotlb=noforce \
+        cma_sysfs.experimental=Y \
+        cgroup_disable=memory \
+        rcupdate.rcu_expedited=1 \
+        rcu_nocbs=all \
+        stack_depot_disable=off \
+        page_pinner=on \
+        swiotlb=1024 \
+        disable_dma32=on \
+        at24.write_timeout=100 \
+        log_buf_len=1024K \
+        bootconfig"
+BOARD_MKBOOTIMG_ARGS += --base $(BOARD_KERNEL_BASE) #
+BOARD_MKBOOTIMG_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE) # 
+BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET) #
+BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET) #
+BOARD_MKBOOTIMG_ARGS += --kernel_offset $(BOARD_KERNEL_OFFSET) #
+BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION) #
+BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET) #
+BOARD_MKBOOTIMG_ARGS += --vendor_cmdline $(VENDOR_CMDLINE)
+# Ramdisk use lz4
+BOARD_RAMDISK_USE_LZ4 := true
+# BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := false
+BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
+# BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
+AB_OTA_UPDATER := true
+AB_OTA_PARTITIONS += \
+    boot \
+    init_boot \
+    vendor_boot \
+    dtbo \
+    vbmeta \
+    vbmeta_system \
+    vbmeta_vendor \
+    product \
+    system \
+    system_ext \
+    system_dlkm \
+    vendor \
+    vendor_dlkm \
+    modem \
+    vendor_kernel_boot \
+    tzsw \
+    idfw \
+    abl \
+    pvmfw \
+    bl2 \
+    gsa \
+    bl31 \
+    pbl \
+    gsa_bl1 \
+    bl1 \
+    gcf
+BOARD_AVB_ENABLE := true
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 67108864
+BOARD_SUPER_PARTITION_SIZE := 8531214336 # TODO: Fix hardcoded value
+BOARD_SUPER_PARTITION_GROUPS := google_dynamic_partitions
+BOARD_GOOGLE_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vendor vendor_dlkm product
+BOARD_GOOGLE_DYNAMIC_PARTITIONS_SIZE := 8527020032 # TODO: Fix hardcoded value
+BOARD_PARTITION_LIST := $(call to-upper, $(BOARD_GOOGLE_DYNAMIC_PARTITIONS_PARTITION_LIST))
+$(foreach p, $(BOARD_PARTITION_LIST), $(eval BOARD_$(p)IMAGE_FILE_SYSTEM_TYPE := erofs))
+$(foreach p, $(BOARD_PARTITION_LIST), $(eval TARGET_COPY_OUT_$(p) := $(call to-lower, $(p))))
+BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
+TARGET_USERIMAGES_USE_EXT4 := true
+TARGET_USERIMAGES_USE_F2FS := true
+BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
+TARGET_COPY_OUT_VENDOR := vendor
+BOARD_HAS_LARGE_FILESYSTEM := true
+TARGET_RECOVERY_PIXEL_FORMAT := ABGR_8888
+# TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
+TARGET_RECOVERY_FSTAB := $(DEVICE_UNIFIED_PATH)/recovery.fstab
+TARGET_RECOVERY_WIPE := $(DEVICE_UNIFIED_PATH)/recovery.wipe
+TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
+# TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
+# TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
+# Crypto
+# TW_INCLUDE_CRYPTO := true
+# TW_INCLUDE_CRYPTO_FBE := true
+# TW_INCLUDE_FBE_METADATA_DECRYPT := true
+# BOARD_USES_QCOM_FBE_DECRYPTION := true
+# BOARD_USES_METADATA_PARTITION := true
+# TW_USE_FSCRYPT_POLICY := 2
+PLATFORM_VERSION := 14
+PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
+PLATFORM_SECURITY_PATCH := 2099-12-31
+VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
+BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
+TW_INCLUDE_REPACKTOOLS := true
+TW_INCLUDE_RESETPROP := true
+TW_INCLUDE_LIBRESETPROP := true
+TW_INCLUDE_LPDUMP := true
+TW_INCLUDE_LPTOOLS := true
+TARGET_USES_LOGD := true
+TWRP_INCLUDE_LOGCAT := true
+TW_INCLUDE_FASTBOOTD := true
+TW_THEME := portrait_hdpi
+TW_FRAMERATE := 120
+RECOVERY_SDCARD_ON_DATA := true
+TW_EXCLUDE_DEFAULT_USB_INIT := true
+TW_INCLUDE_NTFS_3G := true
+TW_NO_EXFAT_FUSE := true
+TW_USE_TOOLBOX := true
+TARGET_USES_MKE2FS := true
 TW_OVERRIDE_SYSTEM_PROPS := \ 
 "ro.bootimage.build.date.utc=ro.build.date.utc;ro.build.date.utc;ro.odm.build.date.utc=ro.build.date.utc;ro.product.build.date.utc=ro.build.date.utc;ro.system.build.date.utc=ro.build.date.utc;ro.system_ext.build.date.utc=ro.build.date.utc;ro.vendor.build.date.utc=ro.build.date.utc;ro.build.product;ro.build.fingerprint=ro.system.build.fingerprint;ro.build.version.incremental;ro.product.name=ro.product.system.name"
+TW_INCLUDE_FUSE_EXFAT := true
+TW_INCLUDE_FUSE_NTFS := true
+TW_INPUT_BLACKLIST := "hbtp_vm"
+TW_DEFAULT_BRIGHTNESS := 600
+TW_MAX_BRIGHTNESS := 1600
+TW_NO_SCREEN_BLANK := true
+TW_EXTRA_LANGUAGES := true
+TW_DEFAULT_LANGUAGE := en_US
+TW_USE_SERIALNO_PROPERTY_FOR_DEVICE_ID := true
+TW_LOAD_VENDOR_MODULES := "heatmap.ko touch_offload.ko ftm5.ko sec_touch.ko goodix_brl_touch.ko goog_touch_interface.ko"
+TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
+TW_CUSTOM_CPU_TEMP_PATH := "/sys/class/thermal/thermal_zone48/temp"
+TW_BATTERY_SYSFS_WAIT_SECONDS := 6
+TW_BACKUP_EXCLUSIONS := /data/fonts
+TW_DEVICE_VERSION := R12.1-shusky by LeeGarChat

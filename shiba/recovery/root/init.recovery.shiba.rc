@@ -18,6 +18,7 @@ on init
     start keymint-trusty
     start identity-citadeld
     start weaver-citadeld
+    start boot-hal-1-2
     
 
 on init && property:ro.debuggable=1 && property:ro.boot.mode=recovery

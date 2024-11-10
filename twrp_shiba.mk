@@ -9,14 +9,13 @@
 DEVICE_CODENAME := shiba
 DEVICE_PATH := device/google/shusky
 VENDOR_PATH := vendor/google/$(DEVICE_CODENAME)
-$(call inherit-product, $(DEVICE_PATH)/device.mk)
-$(call inherit-product, device/google/zuma/lineage_common.mk)
-$(call inherit-product, device/google/zuma/device-common.mk)
-$(call inherit-product, device/google/gs-common/device.mk)
 
+# $(call inherit-product, device/google/zuma/lineage_common.mk)
+# $(call inherit-product, device/google/zuma/device-common.mk)
+# $(call inherit-product, device/google/gs-common/device.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/developer_gsi_keys.mk)
 # Inherit some common recovery stuff
-$(call inherit-product, vendor/*/config/common.mk)
-
+$(call inherit-product, $(DEVICE_PATH)/device.mk)
 PRODUCT_DEVICE := $(DEVICE_CODENAME)
 PRODUCT_NAME := twrp_$(DEVICE_CODENAME)
 PRODUCT_BRAND := google
@@ -31,3 +30,6 @@ PRODUCT_BUILD_PROP_OVERRIDES += \
     DeviceProduct=$(DEVICE_CODENAME)
 
 $(call inherit-product, $(VENDOR_PATH)/$(DEVICE_CODENAME)-vendor.mk)
+# ModemDiagnosticSystem for desense tool
+PRODUCT_PACKAGES += \
+    ModemDiagnosticSystem \

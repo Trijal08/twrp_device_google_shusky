@@ -24,8 +24,8 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_ven
 # Enable project quotas and casefolding for emulated storage without sdcardfs
 $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 
-#include device/google/shusky-sepolicy/$(DEVICE_CODENAME)-sepolicy.mk
-#include device/google/zuma-sepolicy/zuma-sepolicy.mk
+# $(call inherit-product, device/google/gs-common/bootctrl/bootctrl_aidl.mk)
+# $(call inherit-product, device/google/gs-common/bootctrl/bootctrl_hidl_1.2.mk)
 
 PRODUCT_PACKAGES += \
     linker.vendor_ramdisk \
@@ -39,8 +39,9 @@ PRODUCT_COPY_FILES += \
 	$(DEVICE_PATH)/recovery/root/init.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.rc \
 	$(DEVICE_PATH)/recovery/root/init.recovery.usb.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.recovery.usb.rc \
 	$(DEVICE_PATH)/recovery/root/servicemanager.recovery.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/servicemanager.recovery.rc \
-	$(DEVICE_PATH)/recovery/root/android.hardware.health-service.zuma_recovery.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.health-service.zuma_recovery.rc \
-	$(DEVICE_PATH)/recovery/root/android.hardware.boot-service.default_recovery-pixel.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.boot-service.default_recovery-pixel.rc
+	$(DEVICE_PATH)/recovery/root/android.hardware.health-service.zuma_recovery.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.health-service.zuma_recovery.rc
+
+# $(DEVICE_PATH)/recovery/root/android.hardware.boot-service.default_recovery-pixel.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.boot-service.default_recovery-pixel.rc
 
 # Device Manifest file
 DEVICE_MANIFEST_FILE := \
@@ -58,11 +59,13 @@ PRODUCT_PLATFORM := zuma
 # A/B OTA
 AB_OTA_UPDATER := true
 
+
 PRODUCT_PACKAGES += \
     otapreopt_script \
     cppreopts.sh \
     checkpoint_gc \
     update_engine \
+    update_engine_client \
     update_engine_sideload \
     update_verifier
 
@@ -72,34 +75,41 @@ AB_OTA_POSTINSTALL_CONFIG += \
     FILESYSTEM_TYPE_system=ext4 \
     POSTINSTALL_OPTIONAL_system=true
 
+PRODUCT_PACKAGES += \
+    libtrusty
+
 # Boot control HAL
-PRODUCT_PACKAGES += \
-    android.hardware.boot-service.default-pixel \
-    android.hardware.boot-service.default_recovery-pixel
+# PRODUCT_PACKAGES += \
+#     android.hardware.boot-service.default-pixel \
+#     android.hardware.boot-service.default_recovery-pixel
 
-#PRODUCT_PACKAGES += \
-#    android.hardware.health-service.zuma \
-#    android.hardware.health-service.zuma_recovery \
-#PRODUCT_PACKAGES += \
-#    android.hardware.boot@1.2-impl \
-#    android.hardware.boot@1.2-impl.recovery \
-#    android.hardware.boot@1.2-impl-wrapper \
-#    android.hardware.boot@1.2-impl-wrapper.recovery \
-#    android.hardware.boot@1.2-service
+# PRODUCT_PACKAGES += \
+#     android.hardware.health-service.zuma \
+#     android.hardware.health-service.zuma_recovery
 
 PRODUCT_PACKAGES += \
-    bootctrl.zuma \
-    bootctrl.zuma.recovery \
-    bootctl
+    android.hardware.boot@1.2-service-pixel \
+    android.hardware.boot@1.2-impl-pixel
+    
+
+# PRODUCT_COPY_FILES += \
+#     device/google/gs-common/bootctrl/bootctrl_hidl_1.2:$(TARGET_COPY_OUT_RECOVERY)/system/bin/
+
+
+# PRODUCT_PACKAGES += \
+#     bootctrl.zuma \
+#     bootctrl.zuma.recovery \
+#     bootctl
 
 # Dynamic partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
 # fastbootd
 PRODUCT_PACKAGES += \
-    android.hardware.fastboot@1.0-impl-mock \
-    android.hardware.fastboot@1.0-impl-mock.recovery \
+    android.hardware.fastboot@1.1-impl-mock \
     fastbootd 
+    # android.hardware.fastboot@1.1-impl-mock.recovery \
+    
 
 # vndservicemanager and vndservice no longer included in API 30+, however needed by vendor code.
 PRODUCT_PACKAGES += vndservicemanager
@@ -297,14 +307,19 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@1.0.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@2.0.so
 
-# Build libion
+# # Build libion
+# PRODUCT_PACKAGES += \
+#     libion
+
 PRODUCT_PACKAGES += \
-    libion
+	fstab.zuma \
+	fstab.zuma.vendor_ramdisk \
+	fstab.zuma-fips \
+	fstab.zuma-fips.vendor_ramdisk
 
-# Device resolution
-TARGET_SCREEN_WIDTH := 1344
-TARGET_SCREEN_HEIGHT := 2992
 
+# PRODUCT_PACKAGES += \
+# 	android.hardware.boot-service.default_recovery-pixel
 # Pixelstats broken mic detection
 PRODUCT_PROPERTY_OVERRIDES += vendor.audio.mic_break=true
 
