@@ -80,9 +80,9 @@ PRODUCT_PACKAGES += \
 #     android.hardware.boot-service.default-pixel \
 #     android.hardware.boot-service.default_recovery-pixel
 
-PRODUCT_PACKAGES += \
-     android.hardware.health-service.zuma \
-     android.hardware.health-service.zuma_recovery
+#PRODUCT_PACKAGES += \
+#     android.hardware.health-service.zuma \
+#     android.hardware.health-service.zuma_recovery
 
 PRODUCT_PACKAGES += \
     android.hardware.boot@1.2-service-pixel \
