@@ -84,9 +84,9 @@ PRODUCT_PACKAGES += \
 #     android.hardware.health-service.zuma \
 #     android.hardware.health-service.zuma_recovery
 
-PRODUCT_PACKAGES += \
-    android.hardware.boot@1.2-service-pixel \
-    android.hardware.boot@1.2-impl-pixel
+#PRODUCT_PACKAGES += \
+#    android.hardware.boot@1.2-service-pixel \
+#    android.hardware.boot@1.2-impl-pixel
     
 
 # PRODUCT_COPY_FILES += \
@@ -94,9 +94,9 @@ PRODUCT_PACKAGES += \
 
 
 # PRODUCT_PACKAGES += \
-     bootctrl.zuma \
-     bootctrl.zuma.recovery \
-     bootctl
+#     bootctrl.zuma \
+#     bootctrl.zuma.recovery \
+#     bootctl
 
 # Dynamic partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
@@ -106,13 +106,16 @@ PRODUCT_PACKAGES += \
     android.hardware.fastboot@1.1-impl-mock \
     android.hardware.fastboot@1.1-impl-mock.recovery \
     fastbootd
-    
+
+# Fix data/media/0 bug
+RECOVERY_SDCARD_ON_DATA := true
+BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 
 # vndservicemanager and vndservice no longer included in API 30+, however needed by vendor code.
 PRODUCT_PACKAGES += vndservicemanager
 PRODUCT_PACKAGES += vndservice
 
-# Hidl Service
+# HIDL Service
 PRODUCT_ENFORCE_VINTF_MANIFEST := true
 PRODUCT_PACKAGES += \
     libhidltransport.vendor \
@@ -167,8 +170,7 @@ PRODUCT_COPY_FILES += \
 
 # USB HAL
 PRODUCT_PACKAGES += \
-	android.hardware.usb-service
-PRODUCT_PACKAGES += \
+	android.hardware.usb-service \
 	android.hardware.usb.gadget-service
 
 # SecureElement
@@ -210,7 +212,7 @@ PRODUCT_PACKAGES += \
     android.hardware.identity-support-lib.vendor:64 \
     android.hardware.identity_credential.xml
 
-# Nos
+# NOS
 PRODUCT_PACKAGES += \
     libkeymaster4support.vendor:64 \
     libkeymint_support.vendor:64 \
