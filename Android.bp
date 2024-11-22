@@ -7,7 +7,13 @@
 
 soong_namespace {
 	imports: [
-		"device/google/shusky/husky",
-		"device/google/shusky/shiba",
+		"device/google/shusky/pixel-stuff/conf",
+		"device/google/shusky/pixel-stuff/bootctrl/1.2",
+		// "device/google/shusky/pixel-stuff/bootctrl/aidl",
+		"device/google/shusky/pixel-stuff/mm",
+		"device/google/shusky/included-stuff/bootctl",
+		// "device/google/shusky/pixel-stuff/vibrator",
+		// "device/google/shusky/pixel-stuff/vibrator/cs40l26",
+		// "device/google/shusky/pixel-stuff/vibrator/common",
 	],
 }

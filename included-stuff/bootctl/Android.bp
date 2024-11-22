@@ -1,0 +1,21 @@
+// Copyright 2015 The Android Open Source Project
+
+cc_binary {
+    name: "bootctl_my",
+    srcs: ["bootctl.cpp"],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    recovery: true,
+    shared_libs: [
+        "android.hardware.boot@1.0",
+        "android.hardware.boot@1.1",
+        "android.hardware.boot@1.2",
+        "android.hardware.boot-V1-ndk",
+        "libboot_control_client",
+        "libhidlbase",
+        "libutils",
+    ],
+}

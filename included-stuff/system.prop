@@ -1,0 +1,12 @@
+ro.adb.secure=0
+ro.boot.dynamic_partitions=true
+vendor.gatekeeper.disable_spu=true
+ro.charger.enable_suspend=1
+ro.crypto.allow_encrypt_override=true
+vendor.gatekeeper.disable_spu=true
+
+ro.display.series=Pixel 8
+ro.board.platform=zuma
+ro.adb.secure=0
+ro.crypto.volume.options=
+persist.sys.isUsbOtgEnabled=true

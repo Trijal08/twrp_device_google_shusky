@@ -1,0 +1,4 @@
+import /init.recovery.zuma.rc
+
+# DELETE ME USB BRINGUP b/188672439.  Delete the following two lines after
+# USB is brought up completely.

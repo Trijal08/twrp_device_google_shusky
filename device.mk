@@ -4,325 +4,92 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-LOCAL_PATH := device/google/shusky
-DEVICE_UNIFIED_PATH := device/google/shusky
-DEVICE_PATH := $(DEVICE_UNIFIED_PATH)/$(DEVICE_CODENAME)
 
-TARGET_BOARD_KERNEL_HEADERS := device/google/shusky-kernel/kernel-headers
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += build.variant.self=$(BUILD_VATIANT_SELF)
 
-# Inherit from common AOSP config
-$(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
-$(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
+DEVICE_PATH := device/google/shusky
 
-# Inherit from the common Open Source product configuration
-$(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base_telephony.mk)
+PLATFORM_SECURITY_PATCH := 2099-12-31
 
-# Inherit from virtual AB OTA config
-$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
-$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
+VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
+BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
 
-# Enable project quotas and casefolding for emulated storage without sdcardfs
-$(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 
-#include device/google/shusky-sepolicy/$(DEVICE_CODENAME)-sepolicy.mk
-#include device/google/zuma-sepolicy/zuma-sepolicy.mk
 
-PRODUCT_PACKAGES += \
-    linker.vendor_ramdisk \
-    resize2fs.vendor_ramdisk \
-    fsck.vendor_ramdisk \
-    tune2fs.vendor_ramdisk
+PRODUCT_SOONG_NAMESPACES += $(DEVICE_PATH)
+PLATFORM_VERSION := 14
+PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
 
-# Init files
-PRODUCT_COPY_FILES += \
-	$(DEVICE_PATH)/init.$(DEVICE_CODENAME).rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.$(DEVICE_CODENAME).rc \
-	$(DEVICE_PATH)/recovery/root/init.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.rc \
-	$(DEVICE_PATH)/recovery/root/init.recovery.usb.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.recovery.usb.rc \
-	$(DEVICE_PATH)/recovery/root/servicemanager.recovery.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/servicemanager.recovery.rc \
-	$(DEVICE_PATH)/recovery/root/android.hardware.health-service.zuma_recovery.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.health-service.zuma_recovery.rc \
-	$(DEVICE_PATH)/recovery/root/android.hardware.boot-service.default_recovery-pixel.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.boot-service.default_recovery-pixel.rc
-
-# Device Manifest file
-DEVICE_MANIFEST_FILE := \
-$(DEVICE_PATH)/manifest.xml
-
-# Shipping API
-PRODUCT_SHIPPING_API_LEVEL := 32
-
-# VNDK API
-PRODUCT_TARGET_VNDK_VERSION := 34
-
-# define hardware platform
-PRODUCT_PLATFORM := zuma
-
-# A/B OTA
-AB_OTA_UPDATER := true
-
-PRODUCT_PACKAGES += \
-    otapreopt_script \
-    cppreopts.sh \
-    checkpoint_gc \
-    update_engine \
-    update_engine_sideload \
-    update_verifier
-
-AB_OTA_POSTINSTALL_CONFIG += \
-    RUN_POSTINSTALL_system=true \
-    POSTINSTALL_PATH_system=system/bin/otapreopt_script \
-    FILESYSTEM_TYPE_system=ext4 \
-    POSTINSTALL_OPTIONAL_system=true
-
-# Boot control HAL
-PRODUCT_PACKAGES += \
-    android.hardware.boot-service.default-pixel \
-    android.hardware.boot-service.default_recovery-pixel
-
-#PRODUCT_PACKAGES += \
-#    android.hardware.health-service.zuma \
-#    android.hardware.health-service.zuma_recovery \
-#PRODUCT_PACKAGES += \
-#    android.hardware.boot@1.2-impl \
-#    android.hardware.boot@1.2-impl.recovery \
-#    android.hardware.boot@1.2-impl-wrapper \
-#    android.hardware.boot@1.2-impl-wrapper.recovery \
-#    android.hardware.boot@1.2-service
-
-PRODUCT_PACKAGES += \
-    bootctrl.zuma \
-    bootctrl.zuma.recovery \
-    bootctl
-
-# Dynamic partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
-
-# fastbootd
-PRODUCT_PACKAGES += \
-    android.hardware.fastboot@1.0-impl-mock \
-    android.hardware.fastboot@1.0-impl-mock.recovery \
-    fastbootd 
-
-# vndservicemanager and vndservice no longer included in API 30+, however needed by vendor code.
-PRODUCT_PACKAGES += vndservicemanager
-PRODUCT_PACKAGES += vndservice
-
-# Hidl Service
-PRODUCT_ENFORCE_VINTF_MANIFEST := true
-PRODUCT_PACKAGES += \
-    libhidltransport.vendor \
-    libhwbinder.vendor
-
-# Display Config
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.surface_flinger.ignore_hdr_camera_layers=true
-
-PRODUCT_COPY_FILES += \
-    $(DEVICE_UNIFIED_PATH)/display_colordata_dev_cal0.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_colordata_dev_cal0.pb \
-    $(DEVICE_UNIFIED_PATH)/display_golden_google-hk3_cal0.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_golden_google-hk3_cal0.pb \
-    $(DEVICE_UNIFIED_PATH)/display_golden_external_display_cal2.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_golden_external_display_cal2.pb \
-    $(DEVICE_UNIFIED_PATH)/panel_config_google-hk3_cal0.pb:$(TARGET_COPY_OUT_VENDOR)/etc/panel_config_google-hk3_cal0.pb
-
-# config of display brightness dimming
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.0.brightness.dimming.usage?=1
-PRODUCT_VENDOR_PROPERTIES += \
-    vendor.primarydisplay.op.hs_hz=120 \
-    vendor.primarydisplay.op.ns_hz=60 \
-    vendor.primarydisplay.op.ns_min_dbv=1172
-
-# kernel idle timer for display driver
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.surface_flinger.support_kernel_idle_timer=true
-
-# lhbm peak brightness delay: decided by kernel
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.primarydisplay.lhbm.frames_to_reach_peak_brightness=0
-
-# Display LBE
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.lbe.supported=1
-
-# blocking zone for min idle refresh rate
-PRODUCT_VENDOR_PROPERTIES += \
-    vendor.primarydisplay.min_idle_refresh_rate.default=1 \
-    vendor.primarydisplay.min_idle_refresh_rate.blocking_zone=10 \
-    vendor.primarydisplay.min_idle_refresh_rate.blocking_zone_dbv=492
-
-# Display ACL
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.0.brightness.acl.default=0
-
-# Display RRS default Config
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += persist.vendor.display.primary.boot_config=1008x2244@120
-# TODO: b/250788756 - the property will be phased out after HWC loads user-preferred mode
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.preferred_mode=1008x2244@120
-
-# Set support hide display cutout feature
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.support_hide_display_cutout=true
-
-# Touch
-PRODUCT_COPY_FILES += \
-	frameworks/native/data/etc/android.hardware.touchscreen.multitouch.jazzhand.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.touchscreen.multitouch.jazzhand.xml
-
-# USB HAL
-PRODUCT_PACKAGES += \
-	android.hardware.usb-service
-PRODUCT_PACKAGES += \
-	android.hardware.usb.gadget-service
-
-# SecureElement
-PRODUCT_PACKAGES += \
-	android.hardware.secure_element@1.2-service-gto \
-	android.hardware.secure_element@1.2-service-gto-ese2
-
-# Vibrator HAL
-ACTUATOR_MODEL := luxshare_ict_081545
-ADAPTIVE_HAPTICS_FEATURE := adaptive_haptics_v1
-PRODUCT_VENDOR_PROPERTIES += \
-    persist.vendor.vibrator.hal.chirp.enabled=0 \
-    ro.vendor.vibrator.hal.device.mass=0.222 \
-    ro.vendor.vibrator.hal.loc.coeff=2.8 \
-    persist.vendor.vibrator.hal.context.enable=false \
-    persist.vendor.vibrator.hal.context.scale=60 \
-    persist.vendor.vibrator.hal.context.fade=true \
-    persist.vendor.vibrator.hal.context.cooldowntime=1600 \
-    persist.vendor.vibrator.hal.context.settlingtime=5000 \
-    ro.vendor.vibrator.hal.dbc.enable=true \
-    ro.vendor.vibrator.hal.dbc.envrelcoef=8353728 \
-    ro.vendor.vibrator.hal.dbc.riseheadroom=1909602 \
-    ro.vendor.vibrator.hal.dbc.fallheadroom=1909602 \
-    ro.vendor.vibrator.hal.dbc.txlvlthreshfs=2516583 \
-    ro.vendor.vibrator.hal.dbc.txlvlholdoffms=0 \
-    ro.vendor.vibrator.hal.pm.activetimeout=5
-
-# Power HAL config
-PRODUCT_COPY_FILES += \
-	$(DEVICE_PATH)/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
-
-# PowerStats HAL
-PRODUCT_SOONG_NAMESPACES += \
-    $(DEVICE_UNIFIED_PATH)/powerstats/$(DEVICE_CODENAME) \
-    $(DEVICE_PATH)
-
-# Identity credential
-PRODUCT_PACKAGES += \
-    android.hardware.identity-support-lib.vendor:64 \
-    android.hardware.identity_credential.xml
-
-# Nos
-PRODUCT_PACKAGES += \
-    libkeymaster4support.vendor:64 \
-    libkeymint_support.vendor:64 \
-    libnos:64 \
-    libnosprotos:64 \
-    libnos_client_citadel:64 \
-    libnos_datagram:64 \
-    libnos_datagram_citadel:64 \
-    libnos_transport:64 \
-    nos_app_avb:64 \
-    nos_app_identity:64 \
-    nos_app_keymaster:64 \
-    nos_app_weaver:64 \
-    pixelpowerstats_provider_aidl_interface-cpp.vendor:64
-
-# Misc interfaces
-PRODUCT_PACKAGES += \
-    android.frameworks.stats-V1-ndk.vendor:32 \
-    android.hardware.authsecret@1.0.vendor:64 \
-    android.hardware.biometrics.common-V2-ndk.vendor:64 \
-    android.hardware.biometrics.face-V2-ndk.vendor:64 \
-    android.hardware.biometrics.face@1.0.vendor:64 \
-    android.hardware.biometrics.fingerprint-V2-ndk.vendor:64 \
-    android.hardware.input.common-V1-ndk.vendor:64 \
-    android.hardware.input.processor-V1-ndk.vendor:64 \
-    android.hardware.keymaster@3.0.vendor:64 \
-    android.hardware.keymaster@4.0.vendor:64 \
-    android.hardware.keymaster@4.1.vendor:64 \
-    android.hardware.neuralnetworks-V4-ndk.vendor:64 \
-    android.hardware.oemlock@1.0.vendor:64 \
-    android.hardware.power@1.0.vendor:64 \
-    android.hardware.power@1.1.vendor:64 \
-    android.hardware.power@1.2.vendor:64 \
-    android.hardware.radio.config@1.0.vendor \
-    android.hardware.radio.config@1.1.vendor \
-    android.hardware.radio.config@1.2.vendor \
-    android.hardware.radio.deprecated@1.0.vendor \
-    android.hardware.radio@1.2.vendor \
-    android.hardware.radio@1.3.vendor \
-    android.hardware.radio@1.4.vendor \
-    android.hardware.radio@1.5.vendor \
-    android.hardware.radio@1.6.vendor \
-    android.hardware.secure_element@1.0.vendor:32 \
-    android.hardware.secure_element@1.1.vendor:32 \
-    android.hardware.secure_element@1.2.vendor:32 \
-    android.hardware.thermal@1.0.vendor:32 \
-    android.hardware.thermal@2.0.vendor:32 \
-    android.hardware.weaver@1.0.vendor:64 \
-    android.hardware.wifi@1.1.vendor:64 \
-    android.hardware.wifi@1.2.vendor:64 \
-    android.hardware.wifi@1.3.vendor:64 \
-    android.hardware.wifi@1.4.vendor:64 \
-    android.hardware.wifi@1.5.vendor:64 \
-    android.hardware.wifi@1.6.vendor:64 \
-    com.google.hardware.pixel.display-V4-ndk.vendor:64 \
-    com.google.hardware.pixel.display-V5-ndk.vendor \
-    com.google.hardware.pixel.display-V6-ndk.vendor
-
-# PowerStats HAL
-PRODUCT_PACKAGES += \
-	android.hardware.power.stats-service.pixel
-
-PRODUCT_PACKAGES += \
-	android.hardware.graphics.mapper@4.0-impl \
-	android.hardware.graphics.allocator-V1-service
-
-PRODUCT_PROPERTY_OVERRIDES += \
-	debug.sf.disable_backpressure=0 \
-	debug.sf.enable_gl_backpressure=1 \
-	debug.sf.enable_sdr_dimming=1 \
-	debug.sf.dim_in_gamma_in_enhanced_screenshots=1
-
-PRODUCT_PROPERTY_OVERRIDES += \
-	persist.sys.sf.native_mode=2
-
-$(call soong_config_set,google_displaycolor,displaycolor_platform,zuma)
-PRODUCT_PACKAGES += \
-	android.hardware.composer.hwc3-service.pixel \
-	libdisplaycolor \
-	displaycolor_service
-
-# Use FUSE passthrough
-PRODUCT_PRODUCT_PROPERTIES += \
-	persist.sys.fuse.passthrough.enable=true
-
-# Touch service
-include device/google/gs-common/touch/twoshay/aidl_zuma.mk
-
-# vendor.display.config
+PRODUCT_PACKAGES += linker.vendor_ramdisk
+PRODUCT_PACKAGES += resize2fs.vendor_ramdisk
+PRODUCT_PACKAGES += fsck.vendor_ramdisk
+PRODUCT_PACKAGES += tune2fs.vendor_ramdisk
+PRODUCT_PACKAGES += fstab.zuma.vendor_ramdisk
+PRODUCT_PACKAGES += update_engine_sideload
+PRODUCT_PACKAGES += libdisplaycolor
 RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@1.0.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@2.0.so
+PRODUCT_PACKAGES += android.hardware.boot@1.2-service-pixel
+PRODUCT_PACKAGES += android.hardware.boot@1.2-impl-pixel
+PRODUCT_PACKAGES += fastbootd
+AB_OTA_POSTINSTALL_CONFIG += RUN_POSTINSTALL_system=true
+AB_OTA_POSTINSTALL_CONFIG += POSTINSTALL_PATH_system=system/bin/otapreopt_script
+AB_OTA_POSTINSTALL_CONFIG += POSTINSTALL_OPTIONAL_system=true
+AB_OTA_POSTINSTALL_CONFIG += FILESYSTEM_TYPE_system=ext4
 
-# Build libion
-PRODUCT_PACKAGES += \
-    libion
+PRODUCT_PACKAGES += otapreopt_script
+PRODUCT_PACKAGES += checkpoint_gc
+PRODUCT_PACKAGES += cppreopts.sh
+PRODUCT_PACKAGES += update_engine
+PRODUCT_PACKAGES += update_verifier
+PRODUCT_PACKAGES += e2fsck.vendor_ramdisk libsysutils
 
-# Device resolution
-TARGET_SCREEN_WIDTH := 1344
-TARGET_SCREEN_HEIGHT := 2992
+TARGET_RECOVERY_DEVICE_MODULES += libion
+TARGET_RECOVERY_DEVICE_MODULES += vendor.display.config@1.0 
+TARGET_RECOVERY_DEVICE_MODULES += vendor.display.config@2.0
+RECOVERY_LIBRARY_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libion.so
+BOARD_USES_METADATA_PARTITION := true
+PRODUCT_PACKAGES += fstab.zuma-fips.vendor_ramdisk
+PRODUCT_PACKAGES += resize.f2fs.vendor_ramdisk
+PRODUCT_PACKAGES += linker_hwasan64.vendor_ramdisk
+PRODUCT_PACKAGES += dump.f2fs.vendor_ramdisk
+PRODUCT_PACKAGES += defrag.f2fs.vendor_ramdisk
+PRODUCT_PACKAGES += libtrusty
+PRODUCT_PACKAGES += vndservicemanager
+PRODUCT_PACKAGES += vndservice
+PRODUCT_PACKAGES += libhidltransport.vendor
+PRODUCT_PACKAGES += audioroute
 
-# Pixelstats broken mic detection
-PRODUCT_PROPERTY_OVERRIDES += vendor.audio.mic_break=true
+PRODUCT_PACKAGES += libaudioroutelite
 
-# Project
-include hardware/google/pixel/common/pixel-common-device.mk
+ifeq ($(BUILD_VATIANT_SELF),PB)
 
-# Factory OTA
--include vendor/google/factoryota/client/factoryota.mk
+    PRODUCT_SHIPPING_API_LEVEL := 34
+    PRODUCT_TARGET_VNDK_VERSION := 34
+    TARGET_VNDK_VERSION := 34
+    
+    DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/included-stuff/manifest.xml
+    PRODUCT_ENFORCE_VINTF_MANIFEST := true
 
-# storage
--include hardware/google/pixel/pixelstats/device.mk
+    PRODUCT_PACKAGES += bootctl
+    PRODUCT_PACKAGES += logcat
+    PRODUCT_PACKAGES += logd 
+    PRODUCT_PACKAGES += auditctl
+    PRODUCT_PACKAGES += libsysutils libcap
+    RECOVERY_LIBRARY_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libcap
+    RECOVERY_LIBRARY_SOURCE_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libsysutils.so
+    RECOVERY_BINARY_SOURCE_FILES += $(TARGET_OUT_EXECUTABLES)/auditctl
+    RECOVERY_BINARY_SOURCE_FILES += $(TARGET_OUT_EXECUTABLES)/bootctl
+    RECOVERY_BINARY_SOURCE_FILES += $(TARGET_OUT_EXECUTABLES)/logcat
+    RECOVERY_BINARY_SOURCE_FILES += $(TARGET_OUT_EXECUTABLES)/logd
+    # PRODUCT_PACKAGES += android.hardware.fastboot@1.1-impl-pixel
+else
 
-# thermal
--include hardware/google/pixel/thermal/device.mk
+    PRODUCT_SHIPPING_API_LEVEL := 30
+    PRODUCT_TARGET_VNDK_VERSION := 31
+    ENABLE_VIRTUAL_AB := true
 
-# power HAL
--include hardware/google/pixel/power-libperfmgr/aidl/device.mk
 
-# mm_event
--include hardware/google/pixel/mm/device.mk
-#################################################################################
+endif

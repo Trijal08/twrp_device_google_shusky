@@ -1,0 +1,2 @@
+require board=shiba|shusky
+require partition-exists=vendor_kernel_boot
